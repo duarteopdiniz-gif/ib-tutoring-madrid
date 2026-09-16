@@ -223,7 +223,7 @@
         Fill in the form and I'll get back to you personally, or reach me directly by phone or WhatsApp.
       </p>
       <div class="contact-grid">
-        <form class="contact-form" action="mailto:duarteopdiniz@gmail.com" method="post" enctype="text/plain">
+        <form class="contact-form" id="contactForm" action="https://formspree.io/f/duarteopdiniz@gmail.com" method="POST">
           <div class="field-row">
             <label>
               Your name
@@ -248,7 +248,10 @@
             Message
             <textarea name="message" rows="4" placeholder="Tell me a bit about your child's year group, subjects and goals..."></textarea>
           </label>
+          <!-- Sends a nice email subject to your inbox -->
+          <input type="hidden" name="_subject" value="New tutoring enquiry from your website" />
           <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
         </form>
         <div class="contact-direct">
           <h3>Contact directly</h3>
@@ -274,6 +277,34 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Contact form: submit in the background and show a friendly confirmation
+    (function () {
+      var form = document.getElementById('contactForm');
+      var status = document.getElementById('formStatus');
+      if (!form) return;
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        status.textContent = 'Sending…';
+        status.className = 'form-status';
+        var data = new FormData(form);
+        fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+          .then(function (res) {
+            if (res.ok) {
+              form.reset();
+              status.textContent = '✓ Thank you! Your message has been sent — I\'ll reply within 24 hours.';
+              status.className = 'form-status form-status-ok';
+            } else {
+              status.textContent = 'Something went wrong. Please email me directly at duarteopdiniz@gmail.com.';
+              status.className = 'form-status form-status-err';
+            }
+          })
+          .catch(function () {
+            status.textContent = 'Something went wrong. Please email me directly at duarteopdiniz@gmail.com.';
+            status.className = 'form-status form-status-err';
+          });
+      });
+    })();
   </script>
 </body>
 </html>
